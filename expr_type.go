@@ -1,11 +1,5 @@
 package actionlint
 
-import (
-	"fmt"
-	"sort"
-	"strings"
-)
-
 // Types
 
 // ExprType is interface for types of values in expression.
@@ -26,161 +20,148 @@ type ExprType interface {
 type AnyType struct{}
 
 func (ty AnyType) String() string {
-	return "any"
+	_ = "STUB: not implemented"
+
+	// Assignable returns if other type can be assignable to the type.
+	return ""
 }
 
-// Assignable returns if other type can be assignable to the type.
 func (ty AnyType) Assignable(_ ExprType) bool {
-	return true
+	_ = "STUB: not implemented"
+
+	// Merge merges other type into this type. When other type conflicts with this type, the merged
+	// result is any type as fallback.
+	return false
 }
 
-// Merge merges other type into this type. When other type conflicts with this type, the merged
-// result is any type as fallback.
 func (ty AnyType) Merge(other ExprType) ExprType {
-	return ty
+	_ = "STUB: not implemented"
+
+	// DeepCopy duplicates itself. All its child types are copied recursively.
+	return *new(ExprType)
 }
 
-// DeepCopy duplicates itself. All its child types are copied recursively.
 func (ty AnyType) DeepCopy() ExprType {
-	return ty
+	_ = "STUB: not implemented"
+
+	// NullType is type for null value.
+	return *new(ExprType)
 }
 
-// NullType is type for null value.
 type NullType struct{}
 
 func (ty NullType) String() string {
-	return "null"
+	_ = "STUB: not implemented"
+
+	// Assignable returns if other type can be assignable to the type.
+	return ""
 }
 
-// Assignable returns if other type can be assignable to the type.
-func (ty NullType) Assignable(other ExprType) bool {
-	switch other.(type) {
-	case NullType, AnyType:
-		return true
-	default:
-		return false
-	}
-}
+func (ty NullType) Assignable(other ExprType) bool { _ = "STUB: not implemented"; return false }
 
 // Merge merges other type into this type. When other type conflicts with this type, the merged
 // result is any type as fallback.
-func (ty NullType) Merge(other ExprType) ExprType {
-	if _, ok := other.(NullType); ok {
-		return ty
-	}
-	return AnyType{}
-}
+func (ty NullType) Merge(other ExprType) ExprType { _ = "STUB: not implemented"; return *new(ExprType) }
 
 // DeepCopy duplicates itself. All its child types are copied recursively.
 func (ty NullType) DeepCopy() ExprType {
-	return ty
+	_ = "STUB: not implemented"
+
+	// NumberType is type for number values such as integer or float.
+	return *new(ExprType)
 }
 
-// NumberType is type for number values such as integer or float.
 type NumberType struct{}
 
 func (ty NumberType) String() string {
-	return "number"
+	_ = "STUB: not implemented"
+
+	// Assignable returns if other type can be assignable to the type.
+	return ""
 }
 
-// Assignable returns if other type can be assignable to the type.
 func (ty NumberType) Assignable(other ExprType) bool {
+	_ = "STUB: not implemented"
 	// TODO: Is string of numbers corced into number?
-	switch other.(type) {
-	case NumberType, AnyType:
-		return true
-	default:
-		return false
-	}
+	return false
 }
 
 // Merge merges other type into this type. When other type conflicts with this type, the merged
 // result is any type as fallback.
 func (ty NumberType) Merge(other ExprType) ExprType {
-	switch other.(type) {
-	case NumberType:
-		return ty
-	case StringType:
-		return other
-	default:
-		return AnyType{}
-	}
+	_ = "STUB: not implemented"
+	return *new(ExprType)
 }
 
 // DeepCopy duplicates itself. All its child types are copied recursively.
 func (ty NumberType) DeepCopy() ExprType {
-	return ty
+	_ = "STUB: not implemented"
+
+	// BoolType is type for boolean values.
+	return *new(ExprType)
 }
 
-// BoolType is type for boolean values.
 type BoolType struct{}
 
 func (ty BoolType) String() string {
-	return "bool"
+	_ = "STUB: not implemented"
+
+	// Assignable returns if other type can be assignable to the type.
+	return ""
 }
 
-// Assignable returns if other type can be assignable to the type.
 func (ty BoolType) Assignable(other ExprType) bool {
+	_ = "STUB: not implemented"
 	// Any type can be converted into bool..
 	// e.g.
-	//    if: ${{ steps.foo }}
-	return true
+	//
+	//	if: ${{ steps.foo }}
+	return false
 }
 
 // Merge merges other type into this type. When other type conflicts with this type, the merged
 // result is any type as fallback.
-func (ty BoolType) Merge(other ExprType) ExprType {
-	switch other.(type) {
-	case BoolType:
-		return ty
-	case StringType:
-		return other
-	default:
-		return AnyType{}
-	}
-}
+func (ty BoolType) Merge(other ExprType) ExprType { _ = "STUB: not implemented"; return *new(ExprType) }
 
 // DeepCopy duplicates itself. All its child types are copied recursively.
 func (ty BoolType) DeepCopy() ExprType {
-	return ty
+	_ = "STUB: not implemented"
+
+	// StringType is type for string values.
+	return *new(ExprType)
 }
 
-// StringType is type for string values.
 type StringType struct{}
 
 func (ty StringType) String() string {
-	return "string"
+	_ = "STUB: not implemented"
+
+	// Assignable returns if other type can be assignable to the type.
+	return ""
 }
 
-// Assignable returns if other type can be assignable to the type.
 func (ty StringType) Assignable(other ExprType) bool {
+	_ = "STUB: not implemented"
 	// Bool and null types also can be coerced into string. But in almost all case, those coercing
 	// would be mistakes.
-	switch other.(type) {
-	case StringType, NumberType, AnyType:
-		return true
-	default:
-		return false
-	}
+	return false
 }
 
 // Merge merges other type into this type. When other type conflicts with this type, the merged
 // result is any type as fallback.
 func (ty StringType) Merge(other ExprType) ExprType {
-	switch other.(type) {
-	case StringType, NumberType, BoolType:
-		return ty
-	default:
-		return AnyType{}
-	}
+	_ = "STUB: not implemented"
+	return *new(ExprType)
 }
 
 // DeepCopy duplicates itself. All its child types are copied recursively.
 func (ty StringType) DeepCopy() ExprType {
-	return ty
+	_ = "STUB: not implemented"
+
+	// ObjectType is type for objects, which can hold key-values.
+	return *new(ExprType)
 }
 
-// ObjectType is type for objects, which can hold key-values.
 type ObjectType struct {
 	// Props is map from properties name to their type.
 	Props map[string]ExprType
@@ -195,183 +176,62 @@ type ObjectType struct {
 
 // NewEmptyObjectType creates new loose ObjectType instance which allows unknown props. When
 // accessing to unknown props, their values will fall back to any.
-func NewEmptyObjectType() *ObjectType {
-	return &ObjectType{map[string]ExprType{}, AnyType{}}
-}
+func NewEmptyObjectType() *ObjectType { _ = "STUB: not implemented"; return nil }
 
 // NewObjectType creates new loose ObjectType instance which allows unknown props with given props.
-func NewObjectType(props map[string]ExprType) *ObjectType {
-	return &ObjectType{props, AnyType{}}
-}
+func NewObjectType(props map[string]ExprType) *ObjectType { _ = "STUB: not implemented"; return nil }
 
 // NewEmptyStrictObjectType creates new ObjectType instance which does not allow unknown props.
-func NewEmptyStrictObjectType() *ObjectType {
-	return &ObjectType{map[string]ExprType{}, nil}
-}
+func NewEmptyStrictObjectType() *ObjectType { _ = "STUB: not implemented"; return nil }
 
 // NewStrictObjectType creates new ObjectType instance which does not allow unknown props with
 // given prop types.
 func NewStrictObjectType(props map[string]ExprType) *ObjectType {
-	return &ObjectType{props, nil}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewMapObjectType creates new ObjectType which maps keys to a specific type value.
-func NewMapObjectType(t ExprType) *ObjectType {
-	return &ObjectType{nil, t}
-}
+func NewMapObjectType(t ExprType) *ObjectType { _ = "STUB: not implemented"; return nil }
 
 // IsStrict returns if the type is a strict object, which means no unknown prop is allowed.
-func (ty *ObjectType) IsStrict() bool {
-	return ty.Mapped == nil
-}
+func (ty *ObjectType) IsStrict() bool { _ = "STUB: not implemented"; return false }
 
 // IsLoose returns if the type is a loose object, which allows any unknown props.
-func (ty *ObjectType) IsLoose() bool {
-	_, ok := ty.Mapped.(AnyType)
-	return ok
-}
+func (ty *ObjectType) IsLoose() bool { _ = "STUB: not implemented"; return false }
 
 // Strict sets the object is strict, which means only known properties are allowed.
 func (ty *ObjectType) Strict() {
-	ty.Mapped = nil
+	_ = "STUB: not implemented"
+
+	// Loose sets the object is loose, which means any properties can be set.
+	return
 }
 
-// Loose sets the object is loose, which means any properties can be set.
-func (ty *ObjectType) Loose() {
-	ty.Mapped = AnyType{}
-}
+func (ty *ObjectType) Loose() { _ = "STUB: not implemented"; return }
 
-func (ty *ObjectType) String() string {
-	if !ty.IsStrict() {
-		if ty.IsLoose() {
-			return "object"
-		}
-		return fmt.Sprintf("{string => %s}", ty.Mapped.String())
-	}
-
-	ps := make([]string, 0, len(ty.Props))
-	for n := range ty.Props {
-		ps = append(ps, n)
-	}
-	sort.Strings(ps)
-
-	var b strings.Builder
-	b.WriteByte('{')
-	first := true
-	for _, p := range ps {
-		if first {
-			first = false
-		} else {
-			b.WriteString("; ")
-		}
-		b.WriteString(p)
-		b.WriteString(": ")
-		b.WriteString(ty.Props[p].String())
-	}
-	b.WriteByte('}')
-
-	return b.String()
-}
+func (ty *ObjectType) String() string { _ = "STUB: not implemented"; return "" }
 
 // Assignable returns if other type can be assignable to the type.
 // In other words, rhs type is more strict than lhs (receiver) type.
-func (ty *ObjectType) Assignable(other ExprType) bool {
-	switch other := other.(type) {
-	case AnyType:
-		return true
-	case *ObjectType:
-		if !ty.IsStrict() {
-			if !other.IsStrict() {
-				return ty.Mapped.Assignable(other.Mapped)
-			}
-			for _, t := range other.Props {
-				if !ty.Mapped.Assignable(t) {
-					return false
-				}
-			}
-			return true
-		}
-		// ty is strict
+func (ty *ObjectType) Assignable(other ExprType) bool { _ = "STUB: not implemented"; return false }
 
-		if !other.IsStrict() {
-			for _, t := range ty.Props {
-				if !t.Assignable(other.Mapped) {
-					return false
-				}
-			}
-			return true
-		}
-		// ty and other are strict
+// ty is strict
 
-		for n, r := range other.Props {
-			if l, ok := ty.Props[n]; !ok || !l.Assignable(r) {
-				return false
-			}
-		}
-
-		return true
-	default:
-		return false
-	}
-}
+// ty and other are strict
 
 // Merge merges two object types into one. When other object has unknown props, they are merged into
 // current object. When both have same property, when they are assignable, it remains as-is.
 // Otherwise, the property falls back to any type.
 func (ty *ObjectType) Merge(other ExprType) ExprType {
-	switch other := other.(type) {
-	case *ObjectType:
-		// Shortcuts
-		if len(ty.Props) == 0 && other.IsLoose() {
-			return other
-		}
-		if len(other.Props) == 0 && ty.IsLoose() {
-			return ty
-		}
-
-		mapped := ty.Mapped
-		if mapped == nil {
-			mapped = other.Mapped
-		} else if other.Mapped != nil {
-			mapped = mapped.Merge(other.Mapped)
-		}
-
-		props := make(map[string]ExprType, len(ty.Props))
-		for n, l := range ty.Props {
-			props[n] = l
-		}
-		for n, r := range other.Props {
-			if l, ok := props[n]; ok {
-				props[n] = l.Merge(r)
-			} else {
-				props[n] = r
-				if mapped != nil {
-					mapped = mapped.Merge(r)
-				}
-			}
-		}
-
-		return &ObjectType{
-			Props:  props,
-			Mapped: mapped,
-		}
-	default:
-		return AnyType{}
-	}
+	_ = "STUB: not implemented"
+	return *new(ExprType)
 }
+
+// Shortcuts
 
 // DeepCopy duplicates itself. All its child types are copied recursively.
-func (ty *ObjectType) DeepCopy() ExprType {
-	p := make(map[string]ExprType, len(ty.Props))
-	for n, t := range ty.Props {
-		p[n] = t.DeepCopy()
-	}
-	m := ty.Mapped
-	if m != nil {
-		m = m.DeepCopy()
-	}
-	return &ObjectType{p, m}
-}
+func (ty *ObjectType) DeepCopy() ExprType { _ = "STUB: not implemented"; return *new(ExprType) }
 
 // ArrayType is type for arrays.
 type ArrayType struct {
@@ -381,52 +241,26 @@ type ArrayType struct {
 	Deref bool
 }
 
-func (ty *ArrayType) String() string {
-	return fmt.Sprintf("array<%s>", ty.Elem.String())
-}
+func (ty *ArrayType) String() string { _ = "STUB: not implemented"; return "" }
 
 // Assignable returns if other type can be assignable to the type.
-func (ty *ArrayType) Assignable(other ExprType) bool {
-	switch other := other.(type) {
-	case AnyType:
-		return true
-	case *ArrayType:
-		return ty.Elem.Assignable(other.Elem)
-	default:
-		return false
-	}
-}
+func (ty *ArrayType) Assignable(other ExprType) bool { _ = "STUB: not implemented"; return false }
 
 // Merge merges two object types into one. When other object has unknown props, they are merged into
 // current object. When both have same property, when they are assignable, it remains as-is.
 // Otherwise, the property falls back to any type.
 func (ty *ArrayType) Merge(other ExprType) ExprType {
-	switch other := other.(type) {
-	case *ArrayType:
-		if _, ok := ty.Elem.(AnyType); ok {
-			return ty
-		}
-		if _, ok := other.Elem.(AnyType); ok {
-			return other
-		}
-		return &ArrayType{
-			Elem:  ty.Elem.Merge(other.Elem),
-			Deref: false, // When fusing array deref type, it means prop deref chain breaks
-		}
-	default:
-		return AnyType{}
-	}
+	_ = "STUB: not implemented"
+	return *new(ExprType)
 }
+
+// When fusing array deref type, it means prop deref chain breaks
 
 // DeepCopy duplicates itself. All its child types are copied recursively.
-func (ty *ArrayType) DeepCopy() ExprType {
-	return &ArrayType{ty.Elem.DeepCopy(), ty.Deref}
-}
+func (ty *ArrayType) DeepCopy() ExprType { _ = "STUB: not implemented"; return *new(ExprType) }
 
 // EqualTypes returns if the two types are equal.
-func EqualTypes(l, r ExprType) bool {
-	return l.Assignable(r) && r.Assignable(l)
-}
+func EqualTypes(l, r ExprType) bool { _ = "STUB: not implemented"; return false }
 
 // typeOfJSONValue returns the type of the given JSON value. The JSON value is an any value decoded by json.Unmarshal.
 // https://pkg.go.dev/encoding/json#Unmarshal
@@ -438,37 +272,6 @@ func EqualTypes(l, r ExprType) bool {
 //   - []interface{}, for JSON arrays
 //   - map[string]interface{}, for JSON objects
 //   - nil for JSON null
-func typeOfJSONValue(v any) ExprType {
-	switch v := v.(type) {
-	case bool:
-		return BoolType{}
-	case float64:
-		return NumberType{}
-	case string:
-		return StringType{}
-	case []any:
-		var elem ExprType
-		for _, e := range v {
-			t := typeOfJSONValue(e)
-			if elem == nil {
-				elem = t
-			} else {
-				elem = elem.Merge(t)
-			}
-		}
-		if elem == nil {
-			elem = AnyType{}
-		}
-		return &ArrayType{Elem: elem}
-	case map[string]any:
-		props := make(map[string]ExprType, len(v))
-		for k, v := range v {
-			props[k] = typeOfJSONValue(v)
-		}
-		return NewStrictObjectType(props)
-	case nil:
-		return NullType{}
-	default:
-		panic(v) // Unreachable
-	}
-}
+func typeOfJSONValue(v any) ExprType { _ = "STUB: not implemented"; return *new(ExprType) }
+
+// Unreachable

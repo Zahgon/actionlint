@@ -1,11 +1,6 @@
 package actionlint
 
 import (
-	"fmt"
-	"sort"
-	"strconv"
-	"strings"
-
 	"go.yaml.in/yaml/v4"
 )
 
@@ -17,20 +12,10 @@ type Pos struct {
 	Col int
 }
 
-func (p *Pos) String() string {
-	return fmt.Sprintf("line:%d,col:%d", p.Line, p.Col)
-}
+func (p *Pos) String() string { _ = "STUB: not implemented"; return "" }
 
 // IsBefore returns if the position is before the other position. If they are equal, this function returns false.
-func (p *Pos) IsBefore(other *Pos) bool {
-	if p.Line < other.Line {
-		return true
-	}
-	if p.Line > other.Line {
-		return false
-	}
-	return p.Col < other.Col
-}
+func (p *Pos) IsBefore(other *Pos) bool { _ = "STUB: not implemented"; return false }
 
 // String represents generic string value in YAML file with position.
 type String struct {
@@ -44,29 +29,18 @@ type String struct {
 
 // ContainsExpression checks if the given string contains a ${{ }} placeholder or not. This function
 // is identical to String.ContainsExpression method except for taking a standard string value.
-func ContainsExpression(s string) bool {
-	i := strings.Index(s, "${{")
-	return i >= 0 && i < strings.Index(s, "}}")
-}
+func ContainsExpression(s string) bool { _ = "STUB: not implemented"; return false }
 
 // ContainsExpression returns whether the string contains at least one ${{ }} expression.
-func (s *String) ContainsExpression() bool {
-	return ContainsExpression(s.Value)
-}
+func (s *String) ContainsExpression() bool { _ = "STUB: not implemented"; return false }
 
-func isExprAssigned(s string) bool {
-	v := strings.TrimSpace(s)
-	// Do not check `strings.Count(s.Value, "}}") == 1` because it might appear in JSON string
-	//   if: ${{ env.foo == '{"foo": {"bar": true}}' }}
-	return strings.HasPrefix(v, "${{") &&
-		strings.HasSuffix(v, "}}") &&
-		strings.Count(v, "${{") == 1
-}
+func isExprAssigned(s string) bool { _ = "STUB: not implemented"; return false }
+
+// Do not check `strings.Count(s.Value, "}}") == 1` because it might appear in JSON string
+//   if: ${{ env.foo == '{"foo": {"bar": true}}' }}
 
 // IsExpressionAssigned returns whether a single expression is assigned to the string.
-func (s *String) IsExpressionAssigned() bool {
-	return isExprAssigned(s.Value)
-}
+func (s *String) IsExpressionAssigned() bool { _ = "STUB: not implemented"; return false }
 
 // Bool represents generic boolean value in YAML file with position.
 type Bool struct {
@@ -78,15 +52,7 @@ type Bool struct {
 	Pos *Pos
 }
 
-func (b *Bool) String() string {
-	if b.Expression != nil {
-		return b.Expression.Value
-	}
-	if b.Value {
-		return "true"
-	}
-	return "false"
-}
+func (b *Bool) String() string { _ = "STUB: not implemented"; return "" }
 
 // Int represents generic integer value in YAML file with position.
 type Int struct {
@@ -125,9 +91,7 @@ type WebhookEventFilter struct {
 }
 
 // IsEmpty returns true when it has no value. This may mean the WebhookEventFilter instance itself is nil.
-func (f *WebhookEventFilter) IsEmpty() bool {
-	return f == nil || len(f.Values) == 0
-}
+func (f *WebhookEventFilter) IsEmpty() bool { _ = "STUB: not implemented"; return false }
 
 // WebhookEvent represents event type based on webhook events.
 // Some events can't have 'types' field. Only 'push' and 'pull' events can have 'tags', 'tags-ignore',
@@ -158,9 +122,7 @@ type WebhookEvent struct {
 }
 
 // EventName returns name of the event to trigger this workflow.
-func (e *WebhookEvent) EventName() string {
-	return e.Hook.Value
-}
+func (e *WebhookEvent) EventName() string { _ = "STUB: not implemented"; return "" }
 
 // ScheduleEntry is a single entry in a schedule event.
 // https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#onschedule
@@ -182,11 +144,13 @@ type ScheduledEvent struct {
 
 // EventName returns name of the event to trigger this workflow.
 func (e *ScheduledEvent) EventName() string {
-	return "schedule"
+	_ = "STUB: not implemented"
+
+	// WorkflowDispatchEventInputType is a type for input types of workflow_dispatch events.
+	// https://github.blog/changelog/2021-11-10-github-actions-input-types-for-manual-workflows/
+	return ""
 }
 
-// WorkflowDispatchEventInputType is a type for input types of workflow_dispatch events.
-// https://github.blog/changelog/2021-11-10-github-actions-input-types-for-manual-workflows/
 type WorkflowDispatchEventInputType uint8
 
 const (
@@ -232,9 +196,7 @@ type WorkflowDispatchEvent struct {
 }
 
 // EventName returns name of the event to trigger this workflow.
-func (e *WorkflowDispatchEvent) EventName() string {
-	return "workflow_dispatch"
-}
+func (e *WorkflowDispatchEvent) EventName() string { _ = "STUB: not implemented"; return "" }
 
 // RepositoryDispatchEvent is repository_dispatch event configuration.
 // https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows#repository_dispatch
@@ -246,9 +208,7 @@ type RepositoryDispatchEvent struct {
 }
 
 // EventName returns name of the event to trigger this workflow.
-func (e *RepositoryDispatchEvent) EventName() string {
-	return "repository_dispatch"
-}
+func (e *RepositoryDispatchEvent) EventName() string { _ = "STUB: not implemented"; return "" }
 
 // WorkflowCallEventInputType is a type of inputs at workflow_call event.
 // https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#onworkflow_callinput_idtype
@@ -286,9 +246,7 @@ type WorkflowCallEventInput struct {
 
 // IsRequired returns if the input is marked as required or not.
 // require
-func (i *WorkflowCallEventInput) IsRequired() bool {
-	return i.Required != nil && i.Required.Value
-}
+func (i *WorkflowCallEventInput) IsRequired() bool { _ = "STUB: not implemented"; return false }
 
 // WorkflowCallEventSecret is a secret configuration of workflow_call event.
 // https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#onworkflow_callsecrets
@@ -332,9 +290,7 @@ type WorkflowCallEvent struct {
 }
 
 // EventName returns name of the event to trigger this workflow.
-func (e *WorkflowCallEvent) EventName() string {
-	return "workflow_call"
-}
+func (e *WorkflowCallEvent) EventName() string { _ = "STUB: not implemented"; return "" }
 
 // ImageVersionEvent is image_version event configuration.
 // https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#image_version_ready
@@ -348,9 +304,7 @@ type ImageVersionEvent struct {
 }
 
 // EventName returns name of the event to trigger this workflow.
-func (e *ImageVersionEvent) EventName() string {
-	return "image_version"
-}
+func (e *ImageVersionEvent) EventName() string { _ = "STUB: not implemented"; return "" }
 
 // PermissionScope is struct for respective permission scope like "issues", "checks", ...
 // https://docs.github.com/en/actions/security-for-github-actions/security-guides/automatic-token-authentication#permissions-for-the-github_token
@@ -448,11 +402,13 @@ type ExecRun struct {
 
 // Kind returns kind of the step execution.
 func (e *ExecRun) Kind() ExecKind {
-	return ExecKindRun
+	_ = "STUB: not implemented"
+
+	// Input is an input field for running an action.
+	// https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#jobsjob_idstepswith
+	return *new(ExecKind)
 }
 
-// Input is an input field for running an action.
-// https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#jobsjob_idstepswith
 type Input struct {
 	// Name is a name of the input.
 	Name *String
@@ -477,10 +433,13 @@ type ExecAction struct {
 
 // Kind returns kind of the step execution.
 func (e *ExecAction) Kind() ExecKind {
-	return ExecKindAction
+	_ = "STUB: not implemented"
+	return *
+
+	// RawYAMLValueKind is kind of raw YAML values
+	new(ExecKind)
 }
 
-// RawYAMLValueKind is kind of raw YAML values
 type RawYAMLValueKind int
 
 const (
@@ -514,40 +473,17 @@ type RawYAMLObject struct {
 
 // Kind returns kind of raw YAML value.
 func (o *RawYAMLObject) Kind() RawYAMLValueKind {
-	return RawYAMLValueKindObject
+	_ = "STUB: not implemented"
+	return *new(RawYAMLValueKind)
 }
 
 // Equals returns if the other value is equal to the value.
-func (o *RawYAMLObject) Equals(other RawYAMLValue) bool {
-	switch other := other.(type) {
-	case *RawYAMLObject:
-		if len(o.Props) != len(other.Props) {
-			return false
-		}
-		for n, p1 := range o.Props {
-			if p2, ok := other.Props[n]; !ok || !p1.Equals(p2) {
-				return false
-			}
-		}
-		return true
-	default:
-		return false
-	}
-}
+func (o *RawYAMLObject) Equals(other RawYAMLValue) bool { _ = "STUB: not implemented"; return false }
 
 // Pos returns the start position of the value in the source file
-func (o *RawYAMLObject) Pos() *Pos {
-	return o.pos
-}
+func (o *RawYAMLObject) Pos() *Pos { _ = "STUB: not implemented"; return nil }
 
-func (o *RawYAMLObject) String() string {
-	qs := make([]string, 0, len(o.Props))
-	for n, p := range o.Props {
-		qs = append(qs, fmt.Sprintf("%q: %s", n, p.String()))
-	}
-	sort.Strings(qs)
-	return "{" + strings.Join(qs, ", ") + "}"
-}
+func (o *RawYAMLObject) String() string { _ = "STUB: not implemented"; return "" }
 
 // RawYAMLArray is raw YAML sequence value.
 type RawYAMLArray struct {
@@ -558,49 +494,17 @@ type RawYAMLArray struct {
 
 // Kind returns kind of raw YAML value.
 func (a *RawYAMLArray) Kind() RawYAMLValueKind {
-	return RawYAMLValueKindArray
+	_ = "STUB: not implemented"
+	return *new(RawYAMLValueKind)
 }
 
 // Equals returns if the other value is equal to the value.
-func (a *RawYAMLArray) Equals(other RawYAMLValue) bool {
-	switch other := other.(type) {
-	case *RawYAMLArray:
-		if len(a.Elems) != len(other.Elems) {
-			return false
-		}
-		for i, e1 := range a.Elems {
-			if !e1.Equals(other.Elems[i]) {
-				return false
-			}
-		}
-		return true
-	default:
-		return false
-	}
-}
+func (a *RawYAMLArray) Equals(other RawYAMLValue) bool { _ = "STUB: not implemented"; return false }
 
 // Pos returns the start position of the value in the source file
-func (a *RawYAMLArray) Pos() *Pos {
-	return a.pos
-}
+func (a *RawYAMLArray) Pos() *Pos { _ = "STUB: not implemented"; return nil }
 
-func (a *RawYAMLArray) String() string {
-	var b strings.Builder
-	b.WriteRune('[')
-
-	comma := false
-	for _, e := range a.Elems {
-		if comma {
-			b.WriteString(", ")
-		} else {
-			comma = true
-		}
-		b.WriteString(e.String())
-	}
-
-	b.WriteRune(']')
-	return b.String()
-}
+func (a *RawYAMLArray) String() string { _ = "STUB: not implemented"; return "" }
 
 // RawYAMLString is raw YAML scalar value.
 type RawYAMLString struct {
@@ -613,27 +517,17 @@ type RawYAMLString struct {
 
 // Kind returns kind of raw YAML value.
 func (s *RawYAMLString) Kind() RawYAMLValueKind {
-	return RawYAMLValueKindString
+	_ = "STUB: not implemented"
+	return *new(RawYAMLValueKind)
 }
 
 // Equals returns if the other value is equal to the value.
-func (s *RawYAMLString) Equals(other RawYAMLValue) bool {
-	switch other := other.(type) {
-	case *RawYAMLString:
-		return s.Value == other.Value
-	default:
-		return false
-	}
-}
+func (s *RawYAMLString) Equals(other RawYAMLValue) bool { _ = "STUB: not implemented"; return false }
 
 // Pos returns the start position of the value in the source file
-func (s *RawYAMLString) Pos() *Pos {
-	return s.pos
-}
+func (s *RawYAMLString) Pos() *Pos { _ = "STUB: not implemented"; return nil }
 
-func (s *RawYAMLString) String() string {
-	return strconv.Quote(s.Value)
-}
+func (s *RawYAMLString) String() string { _ = "STUB: not implemented"; return "" }
 
 // MatrixRow is one row of matrix. One matrix row can take multiple values. Those variations are
 // stored as row of values in this struct.
@@ -674,17 +568,7 @@ type MatrixCombinations struct {
 }
 
 // ContainsExpression returns if the combinations section includes at least one expression node.
-func (cs *MatrixCombinations) ContainsExpression() bool {
-	if cs.Expression != nil {
-		return true
-	}
-	for _, c := range cs.Combinations {
-		if c.Expression != nil {
-			return true
-		}
-	}
-	return false
-}
+func (cs *MatrixCombinations) ContainsExpression() bool { _ = "STUB: not implemented"; return false }
 
 // Matrix is matrix variations configuration of a job.
 // https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix
@@ -975,10 +859,6 @@ type Workflow struct {
 
 // FindWorkflowCallEvent returns workflow_call event node if exists
 func (w *Workflow) FindWorkflowCallEvent() (*WorkflowCallEvent, bool) {
-	for _, e := range w.On {
-		if e, ok := e.(*WorkflowCallEvent); ok {
-			return e, true
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil, false
 }

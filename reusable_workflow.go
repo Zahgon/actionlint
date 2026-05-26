@@ -1,25 +1,13 @@
 package actionlint
 
 import (
-	"fmt"
 	"io"
-	"os"
-	"path/filepath"
-	"strings"
 	"sync"
 
 	"go.yaml.in/yaml/v4"
 )
 
-func expectedMapping(where string, n *yaml.Node) error {
-	return fmt.Errorf(
-		"yaml: %s must be mapping node but %s node was found at line:%d, col:%d",
-		where,
-		nodeKindName(n.Kind),
-		n.Line,
-		n.Column,
-	)
-}
+func expectedMapping(where string, n *yaml.Node) error { _ = "STUB: not implemented"; return nil }
 
 // ReusableWorkflowMetadataInput is an input metadata for validating local reusable workflow file.
 type ReusableWorkflowMetadataInput struct {
@@ -33,29 +21,7 @@ type ReusableWorkflowMetadataInput struct {
 
 // UnmarshalYAML implements yaml.Unmarshaler.
 func (input *ReusableWorkflowMetadataInput) UnmarshalYAML(n *yaml.Node) error {
-	type metadata struct {
-		Required bool    `yaml:"required"`
-		Default  *string `yaml:"default"`
-		Type     string  `yaml:"type"`
-	}
-
-	var md metadata
-	if err := n.Decode(&md); err != nil {
-		return err
-	}
-
-	input.Required = md.Required && md.Default == nil
-	switch md.Type {
-	case "boolean":
-		input.Type = BoolType{}
-	case "number":
-		input.Type = NumberType{}
-	case "string":
-		input.Type = StringType{}
-	default:
-		input.Type = AnyType{}
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -65,29 +31,11 @@ type ReusableWorkflowMetadataInputs map[string]*ReusableWorkflowMetadataInput
 
 // UnmarshalYAML implements yaml.Unmarshaler.
 func (inputs *ReusableWorkflowMetadataInputs) UnmarshalYAML(n *yaml.Node) error {
-	if n.Kind != yaml.MappingNode {
-		return expectedMapping("on.workflow_call.inputs", n)
-	}
-
-	md := make(ReusableWorkflowMetadataInputs, len(n.Content)/2)
-	for i := 0; i < len(n.Content); i += 2 {
-		k, v := n.Content[i], n.Content[i+1]
-
-		var m ReusableWorkflowMetadataInput
-		if err := v.Decode(&m); err != nil {
-			return err
-		}
-		m.Name = k.Value
-		if m.Type == nil {
-			m.Type = AnyType{} // Reach here when `v` is null node
-		}
-
-		md[strings.ToLower(k.Value)] = &m
-	}
-
-	*inputs = md
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// Reach here when `v` is null node
 
 // ReusableWorkflowMetadataSecret is a secret metadata for validating local reusable workflow file.
 type ReusableWorkflowMetadataSecret struct {
@@ -104,24 +52,7 @@ type ReusableWorkflowMetadataSecrets map[string]*ReusableWorkflowMetadataSecret
 
 // UnmarshalYAML implements yaml.Unmarshaler.
 func (secrets *ReusableWorkflowMetadataSecrets) UnmarshalYAML(n *yaml.Node) error {
-	if n.Kind != yaml.MappingNode {
-		return expectedMapping("on.workflow_call.secrets", n)
-	}
-
-	md := make(ReusableWorkflowMetadataSecrets, len(n.Content)/2)
-	for i := 0; i < len(n.Content); i += 2 {
-		k, v := n.Content[i], n.Content[i+1]
-
-		var s ReusableWorkflowMetadataSecret
-		if err := v.Decode(&s); err != nil {
-			return err
-		}
-		s.Name = k.Value
-
-		md[strings.ToLower(k.Value)] = &s
-	}
-
-	*secrets = md
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -137,19 +68,7 @@ type ReusableWorkflowMetadataOutputs map[string]*ReusableWorkflowMetadataOutput
 
 // UnmarshalYAML implements yaml.Unmarshaler.
 func (outputs *ReusableWorkflowMetadataOutputs) UnmarshalYAML(n *yaml.Node) error {
-	if n.Kind != yaml.MappingNode {
-		return expectedMapping("on.workflow_call.outputs", n)
-	}
-
-	md := make(ReusableWorkflowMetadataOutputs, len(n.Content)/2)
-	for i := 0; i < len(n.Content); i += 2 {
-		k := n.Content[i]
-		md[strings.ToLower(k.Value)] = &ReusableWorkflowMetadataOutput{
-			Name: k.Value,
-		}
-	}
-
-	*outputs = md
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -175,24 +94,18 @@ type LocalReusableWorkflowCache struct {
 }
 
 func (c *LocalReusableWorkflowCache) debug(format string, args ...interface{}) {
-	if c.dbg == nil {
-		return
-	}
-	format = "[LocalReusableWorkflowCache] " + format + "\n"
-	fmt.Fprintf(c.dbg, format, args...)
+	_ = "STUB: not implemented"
+	return
 }
 
 func (c *LocalReusableWorkflowCache) readCache(key string) (*ReusableWorkflowMetadata, bool) {
-	c.mu.RLock()
-	m, ok := c.cache[key]
-	c.mu.RUnlock()
-	return m, ok
+	_ = "STUB: not implemented"
+	return nil, false
 }
 
 func (c *LocalReusableWorkflowCache) writeCache(key string, val *ReusableWorkflowMetadata) {
-	c.mu.Lock()
-	c.cache[key] = val
-	c.mu.Unlock()
+	_ = "STUB: not implemented"
+	return
 }
 
 // FindMetadata finds/parses a reusable workflow metadata located by the 'spec' argument. When project
@@ -205,55 +118,20 @@ func (c *LocalReusableWorkflowCache) writeCache(key string, val *ReusableWorkflo
 //
 // Calling this method is thread-safe.
 func (c *LocalReusableWorkflowCache) FindMetadata(spec string) (*ReusableWorkflowMetadata, error) {
-	if c.proj == nil || !strings.HasPrefix(spec, "./") || ContainsExpression(spec) {
-		return nil, nil
-	}
-
-	if m, ok := c.readCache(spec); ok {
-		c.debug("Cache hit for %s: %v", spec, m)
-		return m, nil
-	}
-
-	file := filepath.Join(c.proj.RootDir(), filepath.FromSlash(spec))
-	src, err := os.ReadFile(file)
-	if err != nil {
-		c.writeCache(spec, nil) // Remember the workflow file was not found
-		return nil, fmt.Errorf("could not read reusable workflow file for %q: %w", spec, err)
-	}
-
-	m, err := parseReusableWorkflowMetadata(src)
-	if err != nil {
-		c.writeCache(spec, nil) // Remember the workflow file was invalid
-		msg := strings.ReplaceAll(err.Error(), "\n", " ")
-		return nil, fmt.Errorf("error while parsing reusable workflow %q: %s", spec, msg)
-	}
-
-	c.debug("New reusable workflow metadata at %s: %v", file, m)
-	c.writeCache(spec, m)
-	return m, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Remember the workflow file was not found
+
+// Remember the workflow file was invalid
 
 func (c *LocalReusableWorkflowCache) convWorkflowPathToSpec(p string) (string, bool) {
-	if c.proj == nil {
-		return "", false
-	}
-	if !filepath.IsAbs(p) {
-		p = filepath.Join(c.cwd, p)
-	}
-	r := c.proj.RootDir()
-	if !strings.HasPrefix(p, r) {
-		return "", false
-	}
-	p, err := filepath.Rel(r, p)
-	if err != nil {
-		return "", false // Unreachable
-	}
-	p = filepath.ToSlash(p)
-	if !strings.HasPrefix(p, "./") {
-		p = "./" + p
-	}
-	return p, true
+	_ = "STUB: not implemented"
+	return "", false
 }
+
+// Unreachable
 
 // WriteWorkflowCallEvent writes reusable workflow metadata by converting from WorkflowCallEvent AST
 // node. The 'wpath' parameter is a path to the workflow file of the AST, which is a relative to the
@@ -262,126 +140,37 @@ func (c *LocalReusableWorkflowCache) convWorkflowPathToSpec(p string) (string, b
 // to workflow call spec, (3) some cache for the workflow is already existing.
 // This method is thread safe.
 func (c *LocalReusableWorkflowCache) WriteWorkflowCallEvent(wpath string, event *WorkflowCallEvent) {
+	_ = "STUB: not implemented"
 	// Convert workflow path to workflow call spec
-	spec, ok := c.convWorkflowPathToSpec(wpath)
-	if !ok {
-		return
-	}
-	c.debug("Workflow call spec from workflow path %s: %s", wpath, spec)
-
-	c.mu.RLock()
-	_, ok = c.cache[spec]
-	c.mu.RUnlock()
-	if ok {
-		return
-	}
-
-	m := &ReusableWorkflowMetadata{
-		Inputs:  ReusableWorkflowMetadataInputs{},
-		Outputs: ReusableWorkflowMetadataOutputs{},
-		Secrets: ReusableWorkflowMetadataSecrets{},
-	}
-
-	for _, i := range event.Inputs {
-		var t ExprType = AnyType{}
-		switch i.Type {
-		case WorkflowCallEventInputTypeBoolean:
-			t = BoolType{}
-		case WorkflowCallEventInputTypeNumber:
-			t = NumberType{}
-		case WorkflowCallEventInputTypeString:
-			t = StringType{}
-		}
-		m.Inputs[i.ID] = &ReusableWorkflowMetadataInput{
-			Type:     t,
-			Required: i.Required != nil && i.Required.Value && i.Default == nil,
-			Name:     i.Name.Value,
-		}
-	}
-
-	for n, o := range event.Outputs {
-		m.Outputs[n] = &ReusableWorkflowMetadataOutput{
-			Name: o.Name.Value,
-		}
-	}
-
-	for n, s := range event.Secrets {
-		r := s.Required != nil && s.Required.Value
-		m.Secrets[n] = &ReusableWorkflowMetadataSecret{
-			Required: r,
-			Name:     s.Name.Value,
-		}
-	}
-
-	c.mu.Lock()
-	c.cache[spec] = m
-	c.mu.Unlock()
-
-	c.debug("Workflow call metadata from workflow %s: %v", wpath, m)
+	return
 }
 
 func parseReusableWorkflowMetadata(src []byte) (*ReusableWorkflowMetadata, error) {
-	type workflow struct {
-		On yaml.Node `yaml:"on"`
-	}
-
-	var w workflow
-	if err := yaml.Unmarshal(src, &w); err != nil {
-		return nil, err // Unreachable
-	}
-
-	n := &w.On
-	if n.Line == 0 && n.Column == 0 {
-		return nil, fmt.Errorf("\"on:\" is not found")
-	}
-
-	switch n.Kind {
-	case yaml.MappingNode:
-		// on:
-		//   workflow_call:
-		for i := 0; i < len(n.Content); i += 2 {
-			k := strings.ToLower(n.Content[i].Value)
-			if k == "workflow_call" {
-				var m ReusableWorkflowMetadata
-				if err := n.Content[i+1].Decode(&m); err != nil {
-					return nil, err
-				}
-				return &m, nil
-			}
-		}
-	case yaml.ScalarNode:
-		// on: workflow_call
-		if v := strings.ToLower(n.Value); v == "workflow_call" {
-			return &ReusableWorkflowMetadata{}, nil
-		}
-	case yaml.SequenceNode:
-		// on: [workflow_call]
-		for _, c := range n.Content {
-			e := strings.ToLower(c.Value)
-			if e == "workflow_call" {
-				return &ReusableWorkflowMetadata{}, nil
-			}
-		}
-	}
-
-	return nil, fmt.Errorf("\"workflow_call\" event trigger is not found in \"on:\" at line:%d, column:%d", n.Line, n.Column)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Unreachable
+
+// on:
+//   workflow_call:
+
+// on: workflow_call
+
+// on: [workflow_call]
 
 // NewLocalReusableWorkflowCache creates a new LocalReusableWorkflowCache instance for the given
 // project. 'cwd' is a current working directory as an absolute file path. The 'Local' means that
 // the cache instance is project-local. It is not available across multiple projects.
 func NewLocalReusableWorkflowCache(proj *Project, cwd string, dbg io.Writer) *LocalReusableWorkflowCache {
-	return &LocalReusableWorkflowCache{
-		proj:  proj,
-		cache: map[string]*ReusableWorkflowMetadata{},
-		cwd:   cwd,
-		dbg:   dbg,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func newNullLocalReusableWorkflowCache(dbg io.Writer) *LocalReusableWorkflowCache {
+	_ = "STUB: not implemented"
 	// Null cache. Cache never hits. It is used when project is not found
-	return &LocalReusableWorkflowCache{dbg: dbg}
+	return nil
 }
 
 // LocalReusableWorkflowCacheFactory is a factory object to create a LocalReusableWorkflowCache
@@ -394,21 +183,14 @@ type LocalReusableWorkflowCacheFactory struct {
 
 // NewLocalReusableWorkflowCacheFactory creates a new LocalReusableWorkflowCacheFactory instance.
 func NewLocalReusableWorkflowCacheFactory(cwd string, dbg io.Writer) *LocalReusableWorkflowCacheFactory {
-	return &LocalReusableWorkflowCacheFactory{map[string]*LocalReusableWorkflowCache{}, cwd, dbg}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // GetCache returns a new or existing LocalReusableWorkflowCache instance per project. When a instance
 // was already created for the project, this method returns the existing instance. Otherwise it creates
 // a new instance and returns it.
 func (f *LocalReusableWorkflowCacheFactory) GetCache(p *Project) *LocalReusableWorkflowCache {
-	if p == nil {
-		return newNullLocalReusableWorkflowCache(f.dbg)
-	}
-	r := p.RootDir()
-	if c, ok := f.caches[r]; ok {
-		return c
-	}
-	c := NewLocalReusableWorkflowCache(p, f.cwd, f.dbg)
-	f.caches[r] = c
-	return c
+	_ = "STUB: not implemented"
+	return nil
 }

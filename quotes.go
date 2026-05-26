@@ -1,8 +1,6 @@
 package actionlint
 
 import (
-	"sort"
-	"strconv"
 	"strings"
 )
 
@@ -12,80 +10,24 @@ type quotesBuilder struct {
 	comma bool
 }
 
-func (b *quotesBuilder) append(s string) {
-	if b.comma {
-		b.inner.WriteString(", ")
-	} else {
-		b.comma = true
-	}
-	b.buf = strconv.AppendQuote(b.buf[:0], s)
-	b.inner.Write(b.buf)
-}
+func (b *quotesBuilder) append(s string) { _ = "STUB: not implemented"; return }
 
-func (b *quotesBuilder) appendRune(r rune) {
-	if b.comma {
-		b.inner.WriteString(", ")
-	} else {
-		b.comma = true
-	}
-	b.buf = strconv.AppendQuoteRune(b.buf[:0], r)
-	b.inner.Write(b.buf)
-}
+func (b *quotesBuilder) appendRune(r rune) { _ = "STUB: not implemented"; return }
 
-func (b *quotesBuilder) build() string {
-	return b.inner.String()
-}
+func (b *quotesBuilder) build() string { _ = "STUB: not implemented"; return "" }
 
-func quotes(ss []string) string {
-	l := len(ss)
-	if l == 0 {
-		return ""
-	}
-	n, max := 0, 0
-	for _, s := range ss {
-		m := len(s) + 2 // 2 for delims
-		n += m
-		if m > max {
-			max = m
-		}
-	}
-	n += (l - 1) * 2 // comma
-	b := quotesBuilder{}
-	b.buf = make([]byte, 0, max)
-	b.inner.Grow(n)
-	for _, s := range ss {
-		b.append(s)
-	}
-	return b.build()
-}
+func quotes(ss []string) string { _ = "STUB: not implemented"; return "" }
 
-func sortedQuotes(ss []string) string {
-	sort.Strings(ss)
-	return quotes(ss)
-}
+// 2 for delims
 
-func quotesAll(sss ...[]string) string {
-	n, max := 0, 0
-	for _, ss := range sss {
-		for _, s := range ss {
-			m := len(s) + 2 // 2 for delims
-			n += m
-			if m > max {
-				max = m
-			}
-		}
-		n += (len(ss) - 1) * 2 // comma
-	}
-	b := quotesBuilder{}
-	b.buf = make([]byte, 0, max)
-	n += (len(sss) - 1) * 2 // comma
-	if n > 0 {
-		b.inner.Grow(n)
-	}
-	for _, ss := range sss {
-		for _, s := range ss {
-			b.append(s)
-		}
-	}
-	return b.build()
-}
+// comma
+
+func sortedQuotes(ss []string) string { _ = "STUB: not implemented"; return "" }
+
+func quotesAll(sss ...[]string) string { _ = "STUB: not implemented"; return "" }
+
+// 2 for delims
+
+// comma
+
+// comma

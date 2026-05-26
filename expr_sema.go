@@ -1,99 +1,34 @@
 package actionlint
 
-import (
-	"encoding/json"
-	"fmt"
-	"strconv"
-	"strings"
-)
-
-func ordinal(i int) string {
-	suffix := "th"
-	switch i % 10 {
-	case 1:
-		if i%100 != 11 {
-			suffix = "st"
-		}
-	case 2:
-		if i%100 != 12 {
-			suffix = "nd"
-		}
-	case 3:
-		if i%100 != 13 {
-			suffix = "rd"
-		}
-	}
-	return fmt.Sprintf("%d%s", i, suffix)
-}
+func ordinal(i int) string { _ = "STUB: not implemented"; return "" }
 
 // parseFormatFuncSpecifiers parses the format string passed to `format()` calls.
 // https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/evaluate-expressions-in-workflows-and-actions#format
 func parseFormatFuncSpecifiers(f string, n int) map[int]struct{} {
-	ret := make(map[int]struct{}, n)
-
-	const none int = -1
-	start, end := none, none
-
-	for i, r := range f {
-		// Before specifier
-		if start == none {
-			if r == '{' {
-				// Opening brace
-				start = i + 1
-			}
-			continue
-		}
-
-		// Inside specifier
-		if end == none {
-			if r == '{' && i == start {
-				// Escaped '{'
-				start = none
-			} else if r == '}' {
-				if i == start {
-					// Empty specifier '{}'
-					start = none
-				} else {
-					// Closing brace.
-					end = i
-				}
-			} else if !('0' <= r && r <= '9') {
-				if r == '{' {
-					start = i + 1
-				} else {
-					start = none
-				}
-			}
-			continue
-		}
-
-		// After specifier
-		if r == '}' {
-			// Parsing specifier needs to be delayed while '}' continues.
-			continue
-		}
-		if (i-end)%2 == 1 {
-			// Odd number of closing braces means the specifier closed. For example '{0}}}' contains
-			// a specifier but '{0}}}}' doesn't.
-			v, _ := strconv.Atoi(f[start:end])
-			ret[v] = struct{}{}
-		}
-		if r == '{' {
-			start = i + 1
-		} else {
-			start = none
-		}
-		end = none
-	}
-
-	// When the input ends while '}' continues at end of specifier
-	if start > none && end > none && (len(f)-end)%2 == 1 {
-		v, _ := strconv.Atoi(f[start:end])
-		ret[v] = struct{}{}
-	}
-
-	return ret
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Before specifier
+
+// Opening brace
+
+// Inside specifier
+
+// Escaped '{'
+
+// Empty specifier '{}'
+
+// Closing brace.
+
+// After specifier
+
+// Parsing specifier needs to be delayed while '}' continues.
+
+// Odd number of closing braces means the specifier closed. For example '{0}}}' contains
+// a specifier but '{0}}}}' doesn't.
+
+// When the input ends while '}' continues at end of specifier
 
 // Functions
 
@@ -114,17 +49,7 @@ type FuncSignature struct {
 	IsConstFunc bool
 }
 
-func (sig *FuncSignature) String() string {
-	ts := make([]string, 0, len(sig.Params))
-	for _, p := range sig.Params {
-		ts = append(ts, p.String())
-	}
-	elip := ""
-	if sig.VariableLengthParams {
-		elip = "..."
-	}
-	return fmt.Sprintf("%s(%s%s) -> %s", sig.Name, strings.Join(ts, ", "), elip, sig.Ret.String())
-}
+func (sig *FuncSignature) String() string { _ = "STUB: not implemented"; return "" }
 
 // BuiltinFuncSignatures is a set of all builtin function signatures. All function names are in
 // lower case because function names are compared in case insensitive.
@@ -379,133 +304,63 @@ type ExprSemanticsChecker struct {
 // NewExprSemanticsChecker creates new ExprSemanticsChecker instance. When checkUntrustedInput is
 // set to true, the checker will make use of possibly untrusted inputs error.
 func NewExprSemanticsChecker(checkUntrustedInput bool, configVars []string) *ExprSemanticsChecker {
-	c := &ExprSemanticsChecker{
-		funcs:           BuiltinFuncSignatures,
-		vars:            BuiltinGlobalVariableTypes,
-		varsCopied:      false,
-		githubVarCopied: false,
-		configVars:      configVars,
-	}
-	if checkUntrustedInput {
-		c.untrusted = NewUntrustedInputChecker(BuiltinUntrustedInputs)
-	}
-	return c
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func errorAtExpr(e ExprNode, msg string) *ExprError {
-	t := e.Token()
-	return &ExprError{
-		Message: msg,
-		Offset:  t.Offset,
-		Line:    t.Line,
-		Column:  t.Column,
-	}
-}
+func errorAtExpr(e ExprNode, msg string) *ExprError { _ = "STUB: not implemented"; return nil }
 
 func errorfAtExpr(e ExprNode, format string, args ...interface{}) *ExprError {
-	return errorAtExpr(e, fmt.Sprintf(format, args...))
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (sema *ExprSemanticsChecker) errorf(e ExprNode, format string, args ...interface{}) {
-	sema.errs = append(sema.errs, errorfAtExpr(e, format, args...))
+	_ = "STUB: not implemented"
+	return
 }
 
-func (sema *ExprSemanticsChecker) ensureVarsCopied() {
-	if sema.varsCopied {
-		return
-	}
+func (sema *ExprSemanticsChecker) ensureVarsCopied() { _ = "STUB: not implemented"; return }
 
-	// Make shallow copy of current variables map not to pollute global variable
-	copied := make(map[string]ExprType, len(sema.vars))
-	for k, v := range sema.vars {
-		copied[k] = v
-	}
-	sema.vars = copied
-	sema.varsCopied = true
-}
+// Make shallow copy of current variables map not to pollute global variable
 
-func (sema *ExprSemanticsChecker) ensureGithubVarCopied() {
-	if sema.githubVarCopied {
-		return
-	}
-	sema.ensureVarsCopied()
-
-	sema.vars["github"] = sema.vars["github"].DeepCopy()
-}
+func (sema *ExprSemanticsChecker) ensureGithubVarCopied() { _ = "STUB: not implemented"; return }
 
 // UpdateMatrix updates matrix object to given object type. Since matrix values change according to
 // 'matrix' section of job configuration, the type needs to be updated.
-func (sema *ExprSemanticsChecker) UpdateMatrix(ty *ObjectType) {
-	sema.ensureVarsCopied()
-	sema.vars["matrix"] = ty
-}
+func (sema *ExprSemanticsChecker) UpdateMatrix(ty *ObjectType) { _ = "STUB: not implemented"; return }
 
 // UpdateSteps updates 'steps' context object to given object type.
-func (sema *ExprSemanticsChecker) UpdateSteps(ty *ObjectType) {
-	sema.ensureVarsCopied()
-	sema.vars["steps"] = ty
-}
+func (sema *ExprSemanticsChecker) UpdateSteps(ty *ObjectType) { _ = "STUB: not implemented"; return }
 
 // UpdateNeeds updates 'needs' context object to given object type.
-func (sema *ExprSemanticsChecker) UpdateNeeds(ty *ObjectType) {
-	sema.ensureVarsCopied()
-	sema.vars["needs"] = ty
-}
+func (sema *ExprSemanticsChecker) UpdateNeeds(ty *ObjectType) { _ = "STUB: not implemented"; return }
 
 // UpdateSecrets updates 'secrets' context object to given object type.
-func (sema *ExprSemanticsChecker) UpdateSecrets(ty *ObjectType) {
-	sema.ensureVarsCopied()
+func (sema *ExprSemanticsChecker) UpdateSecrets(ty *ObjectType) { _ = "STUB: not implemented"; return }
 
-	// Merges automatically supplied secrets with manually defined secrets.
-	// ACTIONS_STEP_DEBUG and ACTIONS_RUNNER_DEBUG seem supplied from caller of the workflow (#130)
-	copied := NewStrictObjectType(map[string]ExprType{
-		"github_token":         StringType{},
-		"actions_step_debug":   StringType{},
-		"actions_runner_debug": StringType{},
-	})
-	for n, v := range ty.Props {
-		copied.Props[n] = v
-	}
-	sema.vars["secrets"] = copied
-}
+// Merges automatically supplied secrets with manually defined secrets.
+// ACTIONS_STEP_DEBUG and ACTIONS_RUNNER_DEBUG seem supplied from caller of the workflow (#130)
 
 // UpdateInputs updates 'inputs' context object to given object type.
-func (sema *ExprSemanticsChecker) UpdateInputs(ty *ObjectType) {
-	sema.ensureVarsCopied()
-	o := sema.vars["inputs"].(*ObjectType)
-	if len(o.Props) == 0 && o.IsStrict() {
-		sema.vars["inputs"] = ty
-		return
-	}
-	// When both `workflow_call` and `workflow_dispatch` are the triggers of the workflow, `inputs` context can be used
-	// by both events. To cover both cases, merge `inputs` contexts into one object type. (#263)
-	sema.vars["inputs"] = o.Merge(ty)
-}
+func (sema *ExprSemanticsChecker) UpdateInputs(ty *ObjectType) { _ = "STUB: not implemented"; return }
+
+// When both `workflow_call` and `workflow_dispatch` are the triggers of the workflow, `inputs` context can be used
+// by both events. To cover both cases, merge `inputs` contexts into one object type. (#263)
 
 // UpdateDispatchInputs updates 'github.event.inputs' and 'inputs' objects to given object type.
 // https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows
 func (sema *ExprSemanticsChecker) UpdateDispatchInputs(ty *ObjectType) {
-	sema.UpdateInputs(ty)
+	_ = "STUB: not implemented"
+	return
 
 	// Update `github.event.inputs`.
 	// Unlike `inputs.*`, type of `github.event.inputs.*` is always string unlike `inputs.*`. We need
 	// to create a new type from `ty` (e.g. {foo: boolean, bar: number} -> {foo: string, bar: string})
-
-	p := make(map[string]ExprType, len(ty.Props))
-	for n := range ty.Props {
-		p[n] = StringType{}
-	}
-	ty = NewStrictObjectType(p)
-
-	sema.ensureGithubVarCopied()
-	sema.vars["github"].(*ObjectType).Props["event"].(*ObjectType).Props["inputs"] = ty
 }
 
 // UpdateJobs updates 'jobs' context object to given object type.
-func (sema *ExprSemanticsChecker) UpdateJobs(ty *ObjectType) {
-	sema.ensureVarsCopied()
-	sema.vars["jobs"] = ty
-}
+func (sema *ExprSemanticsChecker) UpdateJobs(ty *ObjectType) { _ = "STUB: not implemented"; return }
 
 // SetContextAvailability sets available context names while semantics checks. Some contexts limit
 // where they can be used.
@@ -517,32 +372,13 @@ func (sema *ExprSemanticsChecker) UpdateJobs(ty *ObjectType) {
 // available by default.
 // Available contexts for workflow keys can be obtained from actionlint.ContextAvailability.
 func (sema *ExprSemanticsChecker) SetContextAvailability(avail []string) {
-	sema.availableContexts = avail
+	_ = "STUB: not implemented"
+	return
 }
 
 func (sema *ExprSemanticsChecker) checkAvailableContext(n *VariableNode) {
-	ctx := strings.ToLower(n.Name)
-	for _, c := range sema.availableContexts {
-		if c == ctx {
-			return
-		}
-	}
-
-	var notes string
-	switch len(sema.availableContexts) {
-	case 0:
-		notes = "no context is available here"
-	case 1:
-		notes = "available context is " + quotes(sema.availableContexts)
-	default:
-		notes = "available contexts are " + quotes(sema.availableContexts)
-	}
-	sema.errorf(
-		n,
-		"context %q is not allowed here. %s. see https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability for more details",
-		n.Name,
-		notes,
-	)
+	_ = "STUB: not implemented"
+	return
 }
 
 // SetSpecialFunctionAvailability sets names of available special functions while semantics checks.
@@ -557,460 +393,123 @@ func (sema *ExprSemanticsChecker) checkAvailableContext(n *VariableNode) {
 //
 // Available function names for workflow keys can be obtained from actionlint.ContextAvailability.
 func (sema *ExprSemanticsChecker) SetSpecialFunctionAvailability(avail []string) {
-	sema.availableSpecialFuncs = avail
+	_ = "STUB: not implemented"
+	return
 }
 
 func (sema *ExprSemanticsChecker) checkSpecialFunctionAvailability(n *FuncCallNode) {
-	f := strings.ToLower(n.Callee)
-
-	allowed, ok := SpecialFunctionNames[f]
-	if !ok {
-		return // This function is not special
-	}
-
-	for _, sp := range sema.availableSpecialFuncs {
-		if sp == f {
-			return
-		}
-	}
-
-	sema.errorf(
-		n,
-		"calling function %q is not allowed here. %q is only available in %s. see https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability for more details",
-		n.Callee,
-		n.Callee,
-		quotes(allowed),
-	)
+	_ = "STUB: not implemented"
+	return
 }
 
+// This function is not special
+
 func (sema *ExprSemanticsChecker) visitUntrustedCheckerOnEnterNode(n ExprNode) {
-	if sema.untrusted != nil {
-		sema.untrusted.OnVisitNodeEnter(n)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 func (sema *ExprSemanticsChecker) visitUntrustedCheckerOnLeaveNode(n ExprNode) {
-	if sema.untrusted != nil {
-		sema.untrusted.OnVisitNodeLeave(n)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 func (sema *ExprSemanticsChecker) checkVariable(n *VariableNode) ExprType {
-	v, ok := sema.vars[n.Name]
-	if !ok {
-		ss := make([]string, 0, len(sema.vars))
-		for n := range sema.vars {
-			ss = append(ss, n)
-		}
-		sema.errorf(n, "undefined variable %q. available variables are %s", n.Token().Value, sortedQuotes(ss))
-		return AnyType{}
-	}
-
-	sema.checkAvailableContext(n)
-	return v
+	_ = "STUB: not implemented"
+	return *new(ExprType)
 }
 
 func (sema *ExprSemanticsChecker) checkObjectDeref(n *ObjectDerefNode) ExprType {
-	switch ty := sema.check(n.Receiver).(type) {
-	case AnyType:
-		return AnyType{}
-	case *ObjectType:
-		if t, ok := ty.Props[n.Property]; ok {
-			return t
-		}
-		if ty.Mapped != nil {
-			if v, ok := n.Receiver.(*VariableNode); ok && v.Name == "vars" {
-				sema.checkConfigVariables(n)
-			}
-			return ty.Mapped
-		}
-		if ty.IsStrict() {
-			sema.errorf(n, "property %q is not defined in object type %s", n.Property, ty.String())
-		}
-		return AnyType{}
-	case *ArrayType:
-		if !ty.Deref {
-			sema.errorf(n, "receiver of object dereference %q must be type of object but got %q", n.Property, ty.String())
-			return AnyType{}
-		}
-		switch et := ty.Elem.(type) {
-		case AnyType:
-			// When element type is any, map the any type to any. Reuse `ty`
-			return ty
-		case *ObjectType:
-			// Map element type of delererenced array
-			var elem ExprType = AnyType{}
-			if t, ok := et.Props[n.Property]; ok {
-				elem = t
-			} else if et.Mapped != nil {
-				elem = et.Mapped
-			} else if et.IsStrict() {
-				sema.errorf(n, "property %q is not defined in object type %s as element of filtered array", n.Property, et.String())
-			}
-			return &ArrayType{elem, true}
-		default:
-			sema.errorf(
-				n,
-				"property filtered by %q at object filtering must be type of object but got %q",
-				n.Property,
-				ty.Elem.String(),
-			)
-			return AnyType{}
-		}
-	default:
-		sema.errorf(n, "receiver of object dereference %q must be type of object but got %q", n.Property, ty.String())
-		return AnyType{}
-	}
+	_ = "STUB: not implemented"
+	return *new(ExprType)
 }
+
+// When element type is any, map the any type to any. Reuse `ty`
+
+// Map element type of delererenced array
 
 func (sema *ExprSemanticsChecker) checkConfigVariables(n *ObjectDerefNode) {
+	_ = "STUB: not implemented"
 	// https://docs.github.com/en/actions/learn-github-actions/variables#naming-conventions-for-configuration-variables
-	if strings.HasPrefix(n.Property, "github_") {
-		sema.errorf(
-			n,
-			"configuration variable name %q must not start with the GITHUB_ prefix (case insensitive). note: see the convention at https://docs.github.com/en/actions/learn-github-actions/variables#naming-conventions-for-configuration-variables",
-			n.Property,
-		)
-		return
-	}
-	for _, r := range n.Property {
-		// Note: `n.Property` was already converted to lower case by parser
-		// Note: First character cannot be number, but it was already checked by parser
-		if '0' <= r && r <= '9' || 'a' <= r && r <= 'z' || r == '_' {
-			continue
-		}
-		sema.errorf(
-			n,
-			"configuration variable name %q can only contain alphabets, decimal numbers, and '_'. note: see the convention at https://docs.github.com/en/actions/learn-github-actions/variables#naming-conventions-for-configuration-variables",
-			n.Property,
-		)
-		return
-	}
-
-	if sema.configVars == nil {
-		return
-	}
-	if len(sema.configVars) == 0 {
-		sema.errorf(
-			n,
-			"no configuration variable is allowed since the variables list is empty in actionlint.yaml. you may forget adding the variable %q to the list",
-			n.Property,
-		)
-		return
-	}
-
-	for _, v := range sema.configVars {
-		if strings.EqualFold(v, n.Property) {
-			return
-		}
-	}
-
-	sema.errorf(
-		n,
-		"undefined configuration variable %q. defined configuration variables in actionlint.yaml are %s",
-		n.Property,
-		sortedQuotes(sema.configVars),
-	)
+	return
 }
+
+// Note: `n.Property` was already converted to lower case by parser
+// Note: First character cannot be number, but it was already checked by parser
 
 func (sema *ExprSemanticsChecker) checkArrayDeref(n *ArrayDerefNode) ExprType {
-	switch ty := sema.check(n.Receiver).(type) {
-	case AnyType:
-		return &ArrayType{AnyType{}, true}
-	case *ArrayType:
-		ty.Deref = true
-		return ty
-	case *ObjectType:
-		// Object filtering is available for objects, not only arrays (#66)
-
-		if ty.Mapped != nil {
-			// For map object or loose object at receiver of .*
-			switch mty := ty.Mapped.(type) {
-			case AnyType:
-				return &ArrayType{AnyType{}, true}
-			case *ObjectType:
-				return &ArrayType{mty, true}
-			default:
-				sema.errorf(n, "elements of object at receiver of object filtering `.*` must be type of object but got %q. the type of receiver was %q", mty.String(), ty.String())
-				return AnyType{}
-			}
-		}
-
-		// For strict object at receiver of .*
-		found := false
-		for _, t := range ty.Props {
-			if _, ok := t.(*ObjectType); ok {
-				found = true
-				break
-			}
-		}
-		if !found {
-			sema.errorf(n, "object type %q cannot be filtered by object filtering `.*` since it has no object element", ty.String())
-			return AnyType{}
-		}
-
-		return &ArrayType{AnyType{}, true}
-	default:
-		sema.errorf(n, "receiver of object filtering `.*` must be type of array or object but got %q", ty.String())
-		return AnyType{}
-	}
+	_ = "STUB: not implemented"
+	return *new(ExprType)
 }
 
+// Object filtering is available for objects, not only arrays (#66)
+
+// For map object or loose object at receiver of .*
+
+// For strict object at receiver of .*
+
 func (sema *ExprSemanticsChecker) checkIndexAccess(n *IndexAccessNode) ExprType {
+	_ = "STUB: not implemented"
 	// Note: Index must be visited before Index to make UntrustedInputChecker work correctly even if
 	// the expression has some nest like foo[aaa.bbb].bar. Nest happens in top-down order and
 	// properties/indices access check is done in bottom-up order. So, as far as we visit nested
 	// index nodes before visiting operand, the index is recursively checked first.
-	idx := sema.check(n.Index)
-
-	switch ty := sema.check(n.Operand).(type) {
-	case AnyType:
-		return AnyType{}
-	case *ArrayType:
-		switch idx.(type) {
-		case AnyType, NumberType:
-			return ty.Elem
-		default:
-			sema.errorf(n.Index, "index access of array must be type of number but got %q", idx.String())
-			return AnyType{}
-		}
-	case *ObjectType:
-		switch idx.(type) {
-		case AnyType:
-			return AnyType{}
-		case StringType:
-			// Index access with string literal like foo['bar']
-			if lit, ok := n.Index.(*StringNode); ok {
-				if prop, ok := ty.Props[lit.Value]; ok {
-					return prop
-				}
-				if ty.Mapped != nil {
-					return ty.Mapped
-				}
-				if ty.IsStrict() {
-					sema.errorf(n, "property %q is not defined in object type %s", lit.Value, ty.String())
-				}
-			}
-			if ty.Mapped != nil {
-				return ty.Mapped
-			}
-			return AnyType{} // Fallback
-		default:
-			sema.errorf(n.Index, "property access of object must be type of string but got %q", idx.String())
-			return AnyType{}
-		}
-	default:
-		sema.errorf(n, "index access operand must be type of object or array but got %q", ty.String())
-		return AnyType{}
-	}
+	return *new(ExprType)
 }
 
+// Index access with string literal like foo['bar']
+
+// Fallback
+
 func checkFuncSignature(n *FuncCallNode, sig *FuncSignature, args []ExprType) *ExprError {
-	lp, la := len(sig.Params), len(args)
-	if sig.VariableLengthParams && (lp > la) || !sig.VariableLengthParams && lp != la {
-		atLeast := ""
-		if sig.VariableLengthParams {
-			atLeast = "at least "
-		}
-		return errorfAtExpr(
-			n,
-			"number of arguments is wrong. function %q takes %s%d parameters but %d arguments are given",
-			sig.String(),
-			atLeast,
-			lp,
-			la,
-		)
-	}
-
-	for i := 0; i < len(sig.Params); i++ {
-		p, a := sig.Params[i], args[i]
-		if !p.Assignable(a) {
-			return errorfAtExpr(
-				n.Args[i],
-				"%s argument of function call is not assignable. %q cannot be assigned to %q. called function type is %q",
-				ordinal(i+1),
-				a.String(),
-				p.String(),
-				sig.String(),
-			)
-		}
-	}
-
-	// Note: Unlike many languages, this check does not allow 0 argument for the variable length
-	// parameter since it is useful for checking hashFiles() and format().
-	if sig.VariableLengthParams {
-		rest := args[lp:]
-		p := sig.Params[lp-1]
-		for i, a := range rest {
-			if !p.Assignable(a) {
-				return errorfAtExpr(
-					n.Args[lp+i],
-					"%s argument of function call is not assignable. %q cannot be assigned to %q. called function type is %q",
-					ordinal(lp+i+1),
-					a.String(),
-					p.String(),
-					sig.String(),
-				)
-			}
-		}
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
+// Note: Unlike many languages, this check does not allow 0 argument for the variable length
+// parameter since it is useful for checking hashFiles() and format().
+
 func (sema *ExprSemanticsChecker) checkBuiltinFuncCall(n *FuncCallNode, sig *FuncSignature) ExprType {
-	sema.checkSpecialFunctionAvailability(n)
-
-	// Special checks for specific built-in functions
-	switch strings.ToLower(n.Callee) {
-	case "format":
-		lit, ok := n.Args[0].(*StringNode)
-		if !ok {
-			return sig.Ret
-		}
-		l := len(n.Args) - 1 // -1 means removing first format string argument
-
-		holders := parseFormatFuncSpecifiers(lit.Value, l)
-
-		for i := 0; i < l; i++ {
-			if _, ok := holders[i]; !ok {
-				sema.errorf(n, "format string %q does not contain placeholder {%d}. remove argument which is unused in the format string", lit.Value, i)
-				continue
-			}
-			delete(holders, i) // forget it to check unused placeholders
-		}
-
-		for i := range holders {
-			sema.errorf(n, "format string %q contains placeholder {%d} but only %d arguments are given to format", lit.Value, i, l)
-		}
-	case "fromjson":
-		lit, ok := n.Args[0].(*StringNode)
-		if !ok {
-			return sig.Ret
-		}
-		var v any
-		err := json.Unmarshal([]byte(lit.Value), &v)
-		if err == nil {
-			return typeOfJSONValue(v)
-		}
-		if s, ok := err.(*json.SyntaxError); ok {
-			sema.errorf(lit, "broken JSON string is passed to fromJSON() at offset %d: %s", s.Offset, s)
-		}
-	case "case":
-		if len(n.Args)%2 == 0 {
-			sema.errorf(n, "case() requires an odd number of arguments (pred/value pairs + default) but got %d", len(n.Args))
-		}
-	}
-
-	return sig.Ret
+	_ = "STUB: not implemented"
+	return *new(ExprType)
 }
+
+// Special checks for specific built-in functions
+
+// -1 means removing first format string argument
+
+// forget it to check unused placeholders
 
 func (sema *ExprSemanticsChecker) checkFuncCall(n *FuncCallNode) ExprType {
+	_ = "STUB: not implemented"
 	// Check function name in case insensitive. For example, toJson and toJSON are the same function.
-	callee := strings.ToLower(n.Callee)
-	sigs, ok := sema.funcs[callee]
-	if !ok {
-		ss := make([]string, 0, len(sema.funcs))
-		for n := range sema.funcs {
-			ss = append(ss, n)
-		}
-		sema.errorf(n, "undefined function %q. available functions are %s", n.Callee, sortedQuotes(ss))
-		return AnyType{}
-	}
-
-	tys := make([]ExprType, 0, len(n.Args))
-	for _, a := range n.Args {
-		tys = append(tys, sema.check(a))
-	}
-
-	// Check all overloads
-	errs := []*ExprError{}
-	for _, sig := range sigs {
-		err := checkFuncSignature(n, sig, tys)
-		if err == nil {
-			// When one of overload pass type check, overload was resolved correctly
-			return sema.checkBuiltinFuncCall(n, sig)
-		}
-		errs = append(errs, err)
-	}
-
-	// All candidates failed
-	sema.errs = append(sema.errs, errs...)
-
-	return AnyType{}
+	return *new(ExprType)
 }
 
+// Check all overloads
+
+// When one of overload pass type check, overload was resolved correctly
+
+// All candidates failed
+
 func (sema *ExprSemanticsChecker) checkNotOp(n *NotOpNode) ExprType {
-	ty := sema.check(n.Operand)
-	if !(BoolType{}).Assignable(ty) {
-		sema.errorf(n, "type of operand of ! operator %q is not assignable to type \"bool\"", ty.String())
-	}
-	return BoolType{}
+	_ = "STUB: not implemented"
+	return *new(ExprType)
 }
 
 func validateCompareOpOperands(op CompareOpNodeKind, l, r ExprType) bool {
+	_ = "STUB: not implemented"
 	// Comparison behavior: https://docs.github.com/en/actions/learn-github-actions/expressions#operators
-	switch op {
-	case CompareOpNodeKindEq, CompareOpNodeKindNotEq:
-		switch l := l.(type) {
-		case AnyType, NullType:
-			return true
-		case NumberType, BoolType, StringType:
-			switch r.(type) {
-			case *ObjectType, *ArrayType:
-				// These are coerced to NaN hence the comparison result is always false
-				return false
-			default:
-				return true
-			}
-		case *ObjectType:
-			switch r.(type) {
-			case *ObjectType, NullType, AnyType:
-				return true
-			default:
-				return false
-			}
-		case *ArrayType:
-			switch r := r.(type) {
-			case *ArrayType:
-				return validateCompareOpOperands(op, l.Elem, r.Elem)
-			case NullType, AnyType:
-				return true
-			default:
-				return false
-			}
-		default:
-			panic("unreachable")
-		}
-	case CompareOpNodeKindLess, CompareOpNodeKindLessEq, CompareOpNodeKindGreater, CompareOpNodeKindGreaterEq:
-		// null, bool, array, and object cannot be compared with these operators
-		switch l.(type) {
-		case AnyType, NumberType, StringType:
-			switch r.(type) {
-			case NullType, BoolType, *ObjectType, *ArrayType:
-				return false
-			default:
-				return true
-			}
-		case NullType, BoolType, *ObjectType, *ArrayType:
-			return false
-		default:
-			panic("unreachable")
-		}
-	default:
-		return true
-	}
+	return false
 }
 
+// These are coerced to NaN hence the comparison result is always false
+
+// null, bool, array, and object cannot be compared with these operators
+
 func (sema *ExprSemanticsChecker) checkCompareOp(n *CompareOpNode) ExprType {
-	l := sema.check(n.Left)
-	r := sema.check(n.Right)
-
-	if !validateCompareOpOperands(n.Kind, l, r) {
-		sema.errorf(n, "%q value cannot be compared to %q value with %q operator", l.String(), r.String(), n.Kind.String())
-	}
-
-	return BoolType{}
+	_ = "STUB: not implemented"
+	return *new(ExprType)
 }
 
 // checkWithNarrowing checks type of given expression with type narrowing. Type narrowing narrows
@@ -1020,96 +519,38 @@ func (sema *ExprSemanticsChecker) checkCompareOp(n *CompareOpNode) ExprType {
 // This analysis is useful to make type checking more accurate. For example, `some_var && 60 || 20`
 // can be typed as `number` instead of `typeof(some_var) | number`. (#384)
 func (sema *ExprSemanticsChecker) checkWithNarrowing(n ExprNode, isTruthy bool) ExprType {
-	switch n := n.(type) {
-	case *LogicalOpNode:
-		switch n.Kind {
-		case LogicalOpNodeKindAnd:
-			// When `l && r` is true, narrow its type to `typeof(r)`
-			if isTruthy {
-				sema.check(n.Left)
-				return sema.check(n.Right)
-			}
-		case LogicalOpNodeKindOr:
-			// When `l || r` is false, narrow its type to `typeof(r)`
-			if !isTruthy {
-				sema.check(n.Left)
-				return sema.check(n.Right)
-			}
-		}
-		return sema.checkLogicalOp(n)
-	case *NotOpNode:
-		return sema.checkWithNarrowing(n.Operand, !isTruthy)
-	default:
-		return sema.check(n)
-	}
+	_ = "STUB: not implemented"
+	return *new(ExprType)
 }
+
+// When `l && r` is true, narrow its type to `typeof(r)`
+
+// When `l || r` is false, narrow its type to `typeof(r)`
 
 func (sema *ExprSemanticsChecker) checkLogicalOp(n *LogicalOpNode) ExprType {
-	switch n.Kind {
-	case LogicalOpNodeKindAnd:
-		// When `l` is false in `l && r`, its type is `typeof(l)`. Otherwise `typeof(r)`.
-		// Narrow the type of LHS expression by assuming its value is falsy.
-		return sema.checkWithNarrowing(n.Left, false).Merge(sema.check(n.Right))
-	case LogicalOpNodeKindOr:
-		// When `l` is true in `l || r`, its type is `typeof(l)`. Otherwise `typeof(r).
-		// Narrow the type of LHS expression by assuming its value is truthy.
-		return sema.checkWithNarrowing(n.Left, true).Merge(sema.check(n.Right))
-	default:
-		sema.check(n.Left)
-		sema.check(n.Right)
-		return AnyType{}
-	}
+	_ = "STUB: not implemented"
+	return *new(ExprType)
 }
+
+// When `l` is false in `l && r`, its type is `typeof(l)`. Otherwise `typeof(r)`.
+// Narrow the type of LHS expression by assuming its value is falsy.
+
+// When `l` is true in `l || r`, its type is `typeof(l)`. Otherwise `typeof(r).
+// Narrow the type of LHS expression by assuming its value is truthy.
 
 func (sema *ExprSemanticsChecker) check(expr ExprNode) ExprType {
-	sema.visitUntrustedCheckerOnEnterNode(expr)
-	defer sema.visitUntrustedCheckerOnLeaveNode(expr) // Call this method in bottom-up order
-
-	switch e := expr.(type) {
-	case *VariableNode:
-		return sema.checkVariable(e)
-	case *NullNode:
-		return NullType{}
-	case *BoolNode:
-		return BoolType{}
-	case *StringNode:
-		return StringType{}
-	case *IntNode, *FloatNode:
-		return NumberType{}
-	case *ObjectDerefNode:
-		return sema.checkObjectDeref(e)
-	case *ArrayDerefNode:
-		return sema.checkArrayDeref(e)
-	case *IndexAccessNode:
-		return sema.checkIndexAccess(e)
-	case *FuncCallNode:
-		return sema.checkFuncCall(e)
-	case *NotOpNode:
-		return sema.checkNotOp(e)
-	case *CompareOpNode:
-		return sema.checkCompareOp(e)
-	case *LogicalOpNode:
-		return sema.checkLogicalOp(e)
-	default:
-		panic("unreachable")
-	}
+	_ = "STUB: not implemented"
+	return *new(ExprType)
 }
+
+// Call this method in bottom-up order
 
 // Check checks semantics of given expression syntax tree. It returns the type of the expression as
 // the first return value when the check was successfully done. And it returns all errors found
 // while checking the expression as the second return value.
 func (sema *ExprSemanticsChecker) Check(expr ExprNode) (ExprType, []*ExprError) {
-	sema.errs = []*ExprError{}
-	if sema.untrusted != nil {
-		sema.untrusted.Init()
-	}
-	ty := sema.check(expr)
-	errs := sema.errs
-	if sema.untrusted != nil {
-		sema.untrusted.OnVisitEnd()
-		errs = append(errs, sema.untrusted.Errs()...)
-	}
-	return ty, errs
+	_ = "STUB: not implemented"
+	return *new(ExprType), nil
 }
 
 // IsConstant returns the given expression is a constant. For example the following expressions
@@ -1119,34 +560,6 @@ func (sema *ExprSemanticsChecker) Check(expr ExprNode) (ExprType, []*ExprError) 
 //   - startsWith('foobar', 'foo')
 //   - format('{} + {} = {}', 1, 2, 3)
 func (sema *ExprSemanticsChecker) IsConstant(expr ExprNode) bool {
-	switch e := expr.(type) {
-	case *NullNode, *BoolNode, *IntNode, *FloatNode, *StringNode:
-		return true
-	case *VariableNode, *ObjectDerefNode, *ArrayDerefNode, *IndexAccessNode:
-		return false
-	case *NotOpNode:
-		return sema.IsConstant(e.Operand)
-	case *CompareOpNode:
-		return sema.IsConstant(e.Left) && sema.IsConstant(e.Right)
-	case *LogicalOpNode:
-		return sema.IsConstant(e.Left) && sema.IsConstant(e.Right)
-	case *FuncCallNode:
-		for _, a := range e.Args {
-			if !sema.IsConstant(a) {
-				return false
-			}
-		}
-		sigs, ok := sema.funcs[strings.ToLower(e.Callee)]
-		if !ok {
-			return false
-		}
-		for _, s := range sigs {
-			if !s.IsConstFunc {
-				return false
-			}
-		}
-		return true
-	default:
-		panic("unreachable")
-	}
+	_ = "STUB: not implemented"
+	return false
 }

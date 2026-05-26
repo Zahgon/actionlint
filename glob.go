@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 	"text/scanner"
-	"unicode"
 )
 
 // Note:
@@ -29,13 +28,9 @@ type InvalidGlobPattern struct {
 	Column int
 }
 
-func (err *InvalidGlobPattern) Error() string {
-	return fmt.Sprintf("%d: %s", err.Column, err.Message)
-}
+func (err *InvalidGlobPattern) Error() string { _ = "STUB: not implemented"; return "" }
 
-func (err *InvalidGlobPattern) String() string {
-	return err.Error()
-}
+func (err *InvalidGlobPattern) String() string { _ = "STUB: not implemented"; return "" }
 
 type globValidator struct {
 	isRef bool
@@ -45,38 +40,19 @@ type globValidator struct {
 }
 
 func (v *globValidator) error(msg string) {
-	p := v.scan.Pos()
+	_ = "STUB: not implemented"
+
 	// - 1 because character at the error position is already eaten from scanner
-	c := p.Column - 1
-	if p.Line > 1 {
-		c = 0 // fallback to 0
-	}
-	v.errs = append(v.errs, InvalidGlobPattern{msg, c})
+	return
 }
 
-func (v *globValidator) unexpected(char rune, what, why string) {
-	unexpected := "unexpected EOF"
-	if char != scanner.EOF {
-		unexpected = fmt.Sprintf("unexpected character %q", char)
-	}
+// fallback to 0
 
-	while := ""
-	if what != "" {
-		while = fmt.Sprintf(" while checking %s", what)
-	}
+func (v *globValidator) unexpected(char rune, what, why string) { _ = "STUB: not implemented"; return }
 
-	v.error(fmt.Sprintf("invalid glob pattern. %s%s. %s", unexpected, while, why))
-}
+func (v *globValidator) invalidRefChar(c rune, why string) { _ = "STUB: not implemented"; return }
 
-func (v *globValidator) invalidRefChar(c rune, why string) {
-	cfmt := "%q"
-	if unicode.IsPrint(c) {
-		cfmt = "'%c'" // avoid '\\'
-	}
-	format := "character " + cfmt + " is invalid for branch and tag names. %s. see `man git-check-ref-format` for more details. note that regular expression is unavailable"
-	msg := fmt.Sprintf(format, c, why)
-	v.error(msg)
-}
+// avoid '\\'
 
 func (v *globValidator) init(pat string) {
 	v.errs = []InvalidGlobPattern{}
@@ -87,176 +63,48 @@ func (v *globValidator) init(pat string) {
 	}
 }
 
-func (v *globValidator) validateNext() bool {
-	c := v.scan.Next()
-	prec := true
+func (v *globValidator) validateNext() bool { _ = "STUB: not implemented"; return false }
 
-	switch c {
-	case '\\':
-		switch v.scan.Peek() {
-		case '[', '?', '*':
-			c = v.scan.Next() // eat escaped character
-			if v.isRef {
-				v.invalidRefChar(v.scan.Peek(), "ref name cannot contain spaces, ~, ^, :, [, ?, *")
-			}
-		case '+', '\\', '!':
-			c = v.scan.Next() // eat escaped character
-		default:
-			// file path can contain '\' (`mkdir 'foo\bar'` works)
-			if v.isRef {
-				v.invalidRefChar('\\', "only special characters [, ?, +, *, \\, ! can be escaped with \\")
-				c = v.scan.Next()
-			}
-		}
-	case '?':
-		if !v.prec {
-			v.unexpected('?', "special character ? (zero or one)", "the preceding character must not be special character")
-		}
-		prec = false
-	case '+':
-		if !v.prec {
-			v.unexpected('+', "special character + (one or more)", "the preceding character must not be special character")
-		}
-		prec = false
-	case '*':
-		prec = false
-	case '[':
-		if v.scan.Peek() == ']' {
-			c = v.scan.Next() // eat ]
-			v.unexpected(']', "content of character match []", "character match must not be empty")
-			break
-		}
+// eat escaped character
 
-		chars := 0
-	Loop:
-		for {
-			c = v.scan.Next()
-			switch c {
-			case ']':
-				break Loop
-			case scanner.EOF:
-				v.unexpected(c, "end of character match []", "missing ]")
-				return false
-			default:
-				if v.scan.Peek() != '-' {
-					// in case of single character
-					chars++
-					continue Loop
-				}
-				// When match is range of character like 0-9
+// eat escaped character
 
-				chars += 2 // actually one or more. but this is ok since we only check chars > 1 later
-				s := c
-				//lint:ignore SA4006 c should always holds the current character even if it is unused
-				c = v.scan.Next() // eat -
-				switch v.scan.Peek() {
-				case ']':
-					c = v.scan.Next() // eat ]
-					v.unexpected(c, "character range in []", "end of range is missing")
-					break Loop
-				case scanner.EOF:
-					// do nothing
-				default:
-					c = v.scan.Next() // eat end of range
-					if s > c {
-						why := fmt.Sprintf("start of range %q (%d) is larger than end of range %q (%d)", s, s, c, c)
-						v.unexpected(c, "character range in []", why)
-					}
-				}
-			}
-		}
+// file path can contain '\' (`mkdir 'foo\bar'` works)
 
-		if chars == 1 {
-			v.unexpected(c, "character match []", "character match with single character is useless. simply use x instead of [x]")
-		}
-	case '\r':
-		if v.scan.Peek() == '\n' {
-			c = v.scan.Next()
-		}
-		v.unexpected(c, "", "newline cannot be contained")
-	case '\n':
-		v.unexpected('\n', "", "newline cannot be contained")
-	case ' ', '\t', '~', '^', ':':
-		if v.isRef {
-			v.invalidRefChar(c, "ref name cannot contain spaces, ~, ^, :, [, ?, *")
-		}
-	default:
-	}
-	v.prec = prec
+// eat ]
 
-	if v.scan.Peek() == scanner.EOF {
-		if v.isRef && (c == '/' || c == '.') {
-			v.invalidRefChar(c, "ref name must not end with / and .")
-		}
-		return false
-	}
+// in case of single character
 
-	return true
-}
+// When match is range of character like 0-9
 
-func (v *globValidator) validate(pat string) {
-	v.init(pat)
+// actually one or more. but this is ok since we only check chars > 1 later
 
-	if pat == "" {
-		v.error("glob pattern cannot be empty")
-		return
-	}
+//lint:ignore SA4006 c should always holds the current character even if it is unused
+// eat -
 
-	// Handle first character if necessary
-	switch v.scan.Peek() {
-	case '/':
-		if v.isRef {
-			v.scan.Next()
-			v.invalidRefChar('/', "ref name must not start with /")
-			v.prec = true
-		}
-	case '!':
-		v.scan.Next()
-		if v.scan.Peek() == scanner.EOF {
-			v.unexpected('!', "! at first character (negate pattern)", "at least one character must follow !")
-			return
-		}
-		v.prec = false
-	}
+// eat ]
 
-	for v.validateNext() {
-	}
-}
+// do nothing
+
+// eat end of range
+
+func (v *globValidator) validate(pat string) { _ = "STUB: not implemented"; return }
+
+// Handle first character if necessary
 
 func validateGlob(pat string, isRef bool) []InvalidGlobPattern {
-	v := globValidator{}
-	v.isRef = isRef
-	v.validate(pat)
-	return v.errs
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ValidateRefGlob checks a given input as glob pattern for Git ref names. It returns list of
 // errors found by the validation. See the following URL for more details of the syntax:
 // https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet
-func ValidateRefGlob(pat string) []InvalidGlobPattern {
-	return validateGlob(pat, true)
-}
+func ValidateRefGlob(pat string) []InvalidGlobPattern { _ = "STUB: not implemented"; return nil }
 
 // ValidatePathGlob checks a given input as glob pattern for file paths. It returns list of
 // errors found by the validation. See the following URL for more details of the syntax:
 // https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet
-func ValidatePathGlob(pat string) []InvalidGlobPattern {
-	p := strings.TrimSpace(pat)
+func ValidatePathGlob(pat string) []InvalidGlobPattern { _ = "STUB: not implemented"; return nil }
 
-	var errs []InvalidGlobPattern
-	if pat != p {
-		errs = append(errs, InvalidGlobPattern{"leading and trailing spaces are not allowed in glob path", 0})
-	}
-
-	// '.' is not handled by path filter (#521)
-	p = strings.TrimPrefix(p, "!")
-	if p == "." || p == ".." || strings.HasPrefix(p, "./") || strings.HasPrefix(p, "../") {
-		errs = append(errs, InvalidGlobPattern{"'.' and '..' are not allowed in glob path", 0})
-	}
-
-	if len(errs) > 0 {
-		return errs
-	}
-
-	return validateGlob(pat, false)
-}
+// '.' is not handled by path filter (#521)

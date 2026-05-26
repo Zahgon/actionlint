@@ -1,7 +1,5 @@
 package actionlint
 
-import "fmt"
-
 // ExprError is an error type caused by lexing/parsing expression syntax. For more details, see
 // https://docs.github.com/en/actions/learn-github-actions/expressions
 type ExprError struct {
@@ -15,10 +13,6 @@ type ExprError struct {
 	Column int
 }
 
-func (e *ExprError) Error() string {
-	return fmt.Sprintf("%d:%d:%d: %s", e.Line, e.Column, e.Offset, e.Message)
-}
+func (e *ExprError) Error() string { _ = "STUB: not implemented"; return "" }
 
-func (e *ExprError) String() string {
-	return e.Error()
-}
+func (e *ExprError) String() string { _ = "STUB: not implemented"; return "" }

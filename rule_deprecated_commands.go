@@ -14,45 +14,7 @@ type RuleDeprecatedCommands struct {
 }
 
 // NewRuleDeprecatedCommands creates a new RuleDeprecatedCommands instance.
-func NewRuleDeprecatedCommands() *RuleDeprecatedCommands {
-	return &RuleDeprecatedCommands{
-		RuleBase: RuleBase{
-			name: "deprecated-commands",
-			desc: "Checks for deprecated \"set-output\", \"save-state\", \"set-env\", and \"add-path\" commands at \"run:\"",
-		},
-	}
-}
+func NewRuleDeprecatedCommands() *RuleDeprecatedCommands { _ = "STUB: not implemented"; return nil }
 
 // VisitStep is callback when visiting Step node.
-func (rule *RuleDeprecatedCommands) VisitStep(n *Step) error {
-	if r, ok := n.Exec.(*ExecRun); ok && r.Run != nil {
-		for _, m := range deprecatedCommandsPattern.FindAllStringSubmatch(r.Run.Value, -1) {
-			c := m[1]
-			if len(c) == 0 {
-				c = m[2]
-			}
-
-			var a string
-			switch c {
-			case "set-output":
-				a = `echo "{name}={value}" >> $GITHUB_OUTPUT`
-			case "save-state":
-				a = `echo "{name}={value}" >> $GITHUB_STATE`
-			case "set-env":
-				a = `echo "{name}={value}" >> $GITHUB_ENV`
-			case "add-path":
-				a = `echo "{path}" >> $GITHUB_PATH`
-			default:
-				panic("unreachable")
-			}
-
-			rule.Errorf(
-				r.Run.Pos,
-				"workflow command %q was deprecated. use `%s` instead: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions",
-				c,
-				a,
-			)
-		}
-	}
-	return nil
-}
+func (rule *RuleDeprecatedCommands) VisitStep(n *Step) error { _ = "STUB: not implemented"; return nil }
